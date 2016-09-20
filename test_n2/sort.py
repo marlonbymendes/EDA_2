@@ -8,6 +8,5 @@ for i in range(0, arraySize):
 
 array.sort()
 
-print(arraySize)
 for i in array:
     print(i)
