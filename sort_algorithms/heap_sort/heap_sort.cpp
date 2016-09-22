@@ -1,45 +1,103 @@
 #include <bits/stdc++.h>
 
+#define debug(x) cout << ">> " << #x << " = " << x << endl
+#define debug_at(arr, at) cout << ">> " << #arr << "[" << at << "] = " << arr[at] << endl
+
 using namespace std;
 
-inline int left(int i) {
-    return 2 * i;
-}
+const int INF = 1 << 30;
 
-inline int right(int i) {
-    return left(i) + 1;
-}
+class Heap {
+private:
 
-void maxHeapify(int i, vector<int> &array, int heapSize) { // 1 indexed
-    int maxIndex = i;
-    int leftIndex = left(i);
-    int rightIndex = right(i);
+//    const int INF = 1 << 30;
 
-    if(leftIndex <= heapSize and array[leftIndex] > array[i])
-        maxIndex = leftIndex;
-    if(rightIndex <= heapSize and array[rightIndex] > array[maxIndex])
-        maxIndex = rightIndex;
-    if(maxIndex != i) {
-        swap(array[i], array[maxIndex]);
-        maxHeapify(maxIndex, array, heapSize);
+    int heapSize;
+    vector<int> heap;
+
+    inline void buildMaxHeap() {
+        for(int i = heapSize / 2; i >= 1; --i) {
+            maxHeapify(i);
+        }
     }
-}
 
-inline void buildMaxHeap(vector<int> &array, int arraySize) {
-    int heapSize = arraySize;
-    for(int i = arraySize / 2; i >= 1; --i) {
-        maxHeapify(i, array, heapSize);
+    void maxHeapify(int i) { // 1 indexed
+        int maxIndex = i;
+        int leftIndex = left(i);
+        int rightIndex = right(i);
+
+        if(leftIndex <= heapSize and heap[leftIndex] > heap[i])
+            maxIndex = leftIndex;
+        if(rightIndex <= heapSize and heap[rightIndex] > heap[maxIndex])
+            maxIndex = rightIndex;
+        if(maxIndex != i) {
+            swap(heap[i], heap[maxIndex]);
+            maxHeapify(maxIndex);
+        }
     }
-}
+
+    inline int left(int i) {
+        return 2 * i;
+    }
+
+    inline int right(int i) {
+        return left(i) + 1;
+    }
+
+    inline int parent(int i) {
+        assert(i > 1);
+        return i / 2;
+    } 
+public:
+    Heap() {
+        heapSize = 0;
+        heap = vector<int>();
+    }
+
+    Heap(vector<int> &array, int arraySize) {
+        heap = array;
+        heapSize = arraySize;
+        buildMaxHeap();
+    }
+    
+   inline int pop() {
+        assert(heapSize > 0);
+        int maxElement = heap[1];
+        swap(heap[1], heap[heapSize]);
+        --heapSize;
+        maxHeapify(1);
+        return maxElement;
+    }
+
+    inline void modify(int i, int value) {
+        assert(value > heap[i]);
+        heap[i] = value;
+        while(i > 1 and heap[i] > heap[parent(i)]) {
+            swap(heap[i], heap[parent(i)]);
+            i = parent(i);
+        }
+    }
+
+    inline void push(int element) {
+        ++heapSize;
+        heap.push_back(-INF);
+        modify(heapSize, element);
+    }
+
+    inline void print() {
+        debug(heapSize);
+        cout << "\n>>\n";
+        for(int i = 1; i <= heapSize; ++i) {
+            debug_at(heap, i);
+        }
+        cout << ">>\n\n";
+    }
+};
 
 inline void heapSort(vector<int> &array, int arraySize) {
-    buildMaxHeap(array, arraySize);
-    int heapSize = arraySize;
-
-    for(int i = arraySize; i >= 2; --i) {
-        swap(array[i], array[1]);
-        --heapSize;
-        maxHeapify(1, array, heapSize);
+    Heap heap(array, arraySize);
+    for(int i = arraySize; i >= 1; --i) {
+        array[i] = heap.pop();
     }
 }
 
