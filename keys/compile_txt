@@ -1,0 +1,1 @@
+g++ main.cpp grid.cpp bfs.cpp -o prog -Wshadow -Wall -fsanitize=address -std=c++11
